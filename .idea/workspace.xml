@@ -4,17 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="994bfa9f-a693-4f33-a69d-82412075edf2" name="Changes" comment="Finished the documentation and updates">
-      <change afterPath="$PROJECT_DIR$/requirements-from.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requre-base.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="994bfa9f-a693-4f33-a69d-82412075edf2" name="Changes" comment="Refactored to reduce build size">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/meera/extractors.py" beforeDir="false" afterPath="$PROJECT_DIR$/meera/extractors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.bak" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/processing_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/processing_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +170,9 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -239,7 +233,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741175545702</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Refactored to reduce build size">
+      <option name="closed" value="true" />
+      <created>1741182640153</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1741182640153</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -250,7 +252,8 @@
     <MESSAGE value="Done with pdf inference too" />
     <MESSAGE value="Finished the documentation" />
     <MESSAGE value="Finished the documentation and updates" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finished the documentation and updates" />
+    <MESSAGE value="Refactored to reduce build size" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored to reduce build size" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
