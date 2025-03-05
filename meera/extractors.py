@@ -1,5 +1,5 @@
 from youtube_transcript_api import YouTubeTranscriptApi
-from langchain_community.document_loaders import PyPDFLoader
+from pypdf import PdfReader
 from uuid import uuid4
 from typing import Any
 
@@ -32,9 +32,8 @@ def extract_youtube_video_transcript(video_link:str)->str:
 
 def extract_pdf_content(filepath:str)->list[Any]:
     try:
-        loader = PyPDFLoader(filepath)
-        pages = loader.load_and_split()
-        return [ annotate_data_as_json(page.page_content)  for page in pages]
+        reader = PdfReader(filepath)
+        return "\n".join([page.extract_text() for page in reader.pages])
     except Exception as e:
         raise  Exception(e.__str__())
 
