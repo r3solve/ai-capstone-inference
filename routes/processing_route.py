@@ -56,7 +56,7 @@ async  def process_document(file:UploadFile = File(...), namespace:str=Query(...
 
 
 @processing_router.post("/link")
-async  def process_document(link_data:YoutubeLinkUploadModel):
+async  def process_link(link_data:YoutubeLinkUploadModel):
     """
     Process a YouTube video link and store its transcript embeddings in the vector database.
 
