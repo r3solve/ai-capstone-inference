@@ -119,7 +119,44 @@ async def youtube_link_inference(
 
 
 @inference_router.get("/models")
-async  def list_model_available():
+async def list_model_available():
+    """
+    Retrieve a list of available AI models.
+
+    This endpoint provides a list of AI models available for inference.
+    Each model includes details such as name, provider, context length, and parameter size.
+
+    **Request Method:** GET
+    **Endpoint:** `/v1/inference/models`
+
+    **Response:**
+    ```json
+    [
+        {
+            "name": "llama-3.3-70b-versatile",
+            "provider": "Meta",
+            "context_length": 128000,
+            "parameter_size": 32768
+        },
+        {
+            "name": "mixtral-8x7b-32768",
+            "provider": "Mistral",
+            "context_length": 32768,
+            "parameter_size": null
+        }
+    ]
+    ```
+
+    **Response Fields:**
+    - `name` (str): The name of the model.
+    - `provider` (str): The organization providing the model.
+    - `context_length` (int): The maximum number of tokens the model can process in context.
+    - `parameter_size` (int or null): The number of parameters in the model (if available).
+
+    **Status Codes:**
+    - `200 OK`: Successfully returns the list of available models.
+    """
+
     models = [
         {
             "name": "llama-3.3-70b-versatile",
@@ -158,4 +195,5 @@ async  def list_model_available():
             "parameter_size": None
         }
     ]
+
     return JSONResponse(content=models, status_code=200)

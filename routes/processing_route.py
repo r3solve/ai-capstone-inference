@@ -57,6 +57,19 @@ async  def process_document(file:UploadFile = File(...), namespace:str=Query(...
 
 @processing_router.post("/link")
 async  def process_document(link_data:YoutubeLinkUploadModel):
+    """
+    Process a YouTube video link and store its transcript embeddings in the vector database.
+
+    **Request Method:** POST
+    **Endpoint:** `/v1/process/link`
+
+    **Request Body:**
+    ```json
+    {
+        "source_url": "https://www.youtube.com/watch?v=example",
+        "namespace": "user:link:12345"
+    }
+"""
     try:
         meera = MeeraDB(namespace=link_data.namespace)
         video_content = extract_youtube_video_transcript(link_data.source_url)
