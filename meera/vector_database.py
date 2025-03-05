@@ -19,6 +19,9 @@ class MeeraDB:
         self.create_index()
         self.namespace = namespace
 
+    def namespace_exists(self):
+        namespaces = self.index_name.describe_index_stats()['namespaces']
+        return self.namespace in namespaces
 
     def create_index(self):
         if not pc.has_index(self.index_name):

@@ -1,85 +1,161 @@
-
-from fastapi import APIRouter, HTTPException, Query, File, UploadFile
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from  meera.inference import GroqModels
-from meera.extractors import extract_youtube_video_transcript
-from meera.chunkers import  chunk_long_text
+from meera.inference import GroqModels
 from meera.vector_database import MeeraDB
-from models.base_models import YoutubeLinkUploadModel
 
+# Define API Router
+inference_router = APIRouter(prefix='/v1/inference', tags=['inference'])
 
-inference_router = APIRouter(prefix='/v1/inference')
-
+# Initialize the Inference Model
 groq_endpoint = GroqModels()
+
+
 class YouTubeModel(BaseModel):
+    """
+    Model for processing YouTube video inference queries.
+    """
+    query: str
+    namespace: str = Field(
+        "",
+        description="This is the namespace to search in the vector database. "
+                    "Format: `email:[link|doc]:doc_id`",
+        title="Search Space"
+    )
 
-    query:str
-    namespace:str = Field("",
-                          description="This is the namesspace to search in the vector db \ it's email:[link|doc]:doc_id ",
-                          title="Seach Space"
-                          )
-
-
-@inference_router.post("/link/process", description="process link for inference")
-async  def process_document(link_data:YoutubeLinkUploadModel):
-    try:
-        meera = MeeraDB(namespace=link_data.namespace)
-        video_content = extract_youtube_video_transcript(link_data.source_url)
-        video_content_chunks = chunk_long_text(video_content)
-        meera.upsert_embeddings(video_content_chunks)
-        return JSONResponse(content={
-            "response.code":"operation sucesss",
-            "detail":"chunks added to vector db successsfull ",
-            "namespace":link_data.namespace
-        })
-    except Exception as e:
-        return JSONResponse(content={
-            "response.code":"operation failed",
-            "detail":str(e)
-        }, status_code=400)
-
-@inference_router.post("/doc/process",
-                       description="process documents for inference")
-async def process_document_files(file:UploadFile = File(...)):
-    try:
-
-        return JSONResponse(content={
-            "response.code":"operation sucesss",
-            "namespace":"example-namespace",
-            "detail":"operation completed"
-        })
-    except Exception as e:
-        return  JSONResponse(content={
-            "response.code":"operation failed",
-            "detail":"operation could not complete"
-        }, status_code=400)
 
 @inference_router.post("/")
-async  def youtube_link_inference(link:YouTubeModel,
-                                  model_name:str = Query("llama-3.3-70b-versatile")):
+async def youtube_link_inference(
+        link: YouTubeModel,
+        model_name: str = Query("llama-3.3-70b-versatile", description="AI model name to use for inference.")
+):
     """
-     Send inference requests through this enpoint by passing the video data
-    :param link:
-    :param model_name:
-    :return:
-        {
-            "response.status" : "message sucessfull" | "message error",
-            "detail" : "detail reponse"
-        }
+    📌 **YouTube Video Inference API**
+
+    **Endpoint:** `POST /v1/inference/`
+
+    **Description:**
+    - This endpoint allows querying a **YouTube video transcript** stored in the vector database.
+    - Uses an **AI model** (default: `llama-3.3-70b-versatile`) for inference.
+
+    ---
+
+    **🔹 Request Parameters (JSON Body)**
+    - `query` (string, required) → The question or search query for inference.
+    - `namespace` (string, required) → The database namespace storing the video transcript.
+
+    **🔹 Query Parameter**
+    - `model_name` (string, optional) → AI model name (default: `"llama-3.3-70b-versatile"`).
+
+    ---
+
+    **📌 Request Example (JSON)**
+    ```json
+    {
+        "query": "What is the main topic of the video?",
+        "namespace": "user123:link:789"
+    }
+    ```
+
+    ---
+
+    **📌 Response Example (Success)**
+    ```json
+    {
+        "response.code": "message succeeded",
+        "detail": "The video discusses deep learning techniques."
+    }
+    ```
+
+    ---
+
+    **📌 Response Example (Error)**
+    ```json
+    {
+        "response.code": "message.error",
+        "detail": "Namespace not found in vector database."
+    }
+    ```
+
+    **Possible Errors**
+    - `400 Bad Request` → Invalid request data or missing namespace.
+    - `500 Internal Server Error` → AI model failure or vector database error.
+
+    ---
+
+    **🔹 How It Works**
+    1. **Retrieves** stored YouTube video transcript embeddings.
+    2. **Sends query** to the AI model for context-aware inference.
+    3. **Returns the response** with the generated answer.
     """
     try:
+        # Retrieve vector embeddings for the given namespace
         meera = MeeraDB(namespace=link.namespace)
         meera_query_response = meera.query_embeddings(link.query)
-        response = groq_endpoint.infer(link.query, context=meera_query_response, model_name=model_name)
 
-        return JSONResponse(content={
-            "response.code":"message succeeded",
-            "detail":str(response),
-        })
+        # Perform inference using the AI model
+        response = await groq_endpoint.infer(
+            link.query,
+            context=meera_query_response,
+            model_name=model_name
+        )
+
+        return JSONResponse(
+            content={
+                "response.code": "message succeeded",
+                "detail": str(response),
+            }
+        )
+
     except Exception as e:
-        return JSONResponse(content={"response.code":"message.error",
-                                     "detail": str(e)
-                                     },
-                            status_code=400
-                            )
+        return JSONResponse(
+            content={
+                "response.code": "message.error",
+                "detail": str(e)
+            },
+            status_code=400
+        )
+
+
+
+@inference_router.get("/models")
+async  def list_model_available():
+    models = [
+        {
+            "name": "llama-3.3-70b-versatile",
+            "provider": "Meta",
+            "context_length": 128000,
+            "parameter_size": 32768
+        },
+        {
+            "name": "llama-3.1-8b-instant",
+            "provider": "Meta",
+            "context_length": 128000,
+            "parameter_size": 8192
+        },
+        {
+            "name": "llama-guard-3-8b",
+            "provider": "Meta",
+            "context_length": 8192,
+            "parameter_size": None
+        },
+        {
+            "name": "llama3-70b-8192",
+            "provider": "Meta",
+            "context_length": 8192,
+            "parameter_size": None
+        },
+        {
+            "name": "llama3-8b-8192",
+            "provider": "Meta",
+            "context_length": 8192,
+            "parameter_size": None
+        },
+        {
+            "name": "mixtral-8x7b-32768",
+            "provider": "Mistral",
+            "context_length": 32768,
+            "parameter_size": None
+        }
+    ]
+    return JSONResponse(content=models, status_code=200)

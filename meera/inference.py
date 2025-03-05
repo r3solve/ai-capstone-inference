@@ -1,5 +1,5 @@
 import os
-from groq import Groq
+from groq import Groq, AsyncGroq
 from dotenv import load_dotenv
 from typing import Any
 
@@ -7,17 +7,17 @@ load_dotenv()
 class GroqModels:
     def __init__(self):
         self.grok_key = os.environ.get("GROQ_API_KEY")
-        self.client = Groq(
+        self.client = AsyncGroq(
             # This is the default and can be omitted
             api_key=self.grok_key
         )
 
-    def infer(self,
+    async def infer(self,
               query_str:str,
               context: Any,
             model_name:str="llama-3.3-70b-versatile"
               )->str:
-        chat_completion = self.client.chat.completions.create(
+        chat_completion =  await self.client.chat.completions.create(
             messages=[
                 {
                     "role": "system",

@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import  JSONResponse
 from routes.inference_route import  inference_router
-
+from routes.processing_route import processing_router
 
 app = FastAPI(title="Infrence Routes",
-              description="This gateway is for interecting \
-              with the internal inference engine"
+              description="This gateway is for interecting with the internal inference engine"
               )
 
 
@@ -20,7 +19,7 @@ async  def home_route():
     """
     return JSONResponse(content={"message":"welcome to the api"},
                         status_code=200)
-all_routes = [inference_router]
+all_routes = [inference_router, processing_router]
 for router in all_routes:
     app.include_router(router)
 
